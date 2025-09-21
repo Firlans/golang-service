@@ -13,6 +13,6 @@ func main() {
 	db := config.ConnectDB()
 	defer db.Close()
 
-	routes.RegisterUserRoutes(db)
-	config.RunningApp()
+	router := routes.RegisterUserRoutes(db)
+	config.RunningApp(router)
 }

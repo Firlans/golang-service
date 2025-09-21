@@ -37,12 +37,26 @@ func ErrorResponse(message string, err string) entities.Response {
 	}
 }
 
-func SuccessResponse() {
-
+func SuccessResponse(message string, detail interface{}) entities.Response {
+	return entities.Response{
+		Status:  "success",
+		Message: message,
+		Data:    detail,
+	}
 }
 
-func NotFoundResponse() {
+func NotFoundResponse(object string, valueId string) entities.Response {
+	return entities.Response{
+		Status:  "fail",
+		Message: object + " with id's " + valueId + " not found",
+	}
+}
 
+func AlreadyExistsResponse(object string) entities.Response {
+	return entities.Response{
+		Status:  "fail",
+		Message: object + " already exists",
+	}
 }
 
 func InvalidRequestResponse(message string, detail string) entities.Response {
