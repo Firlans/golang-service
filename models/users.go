@@ -60,6 +60,18 @@ func GetUserById(db *sql.DB, id int) (*entities.User, error) {
 	}
 	return &user, nil
 }
+func GetUserByNameAndPassword(db *sql.DB, email string, password string) (*entities.User, error) {
+	var user entities.User
+	row := db.QueryRow("SELECT id, name, email, created_at, updated_at FROM users where email = $1 AND password = $2", email, password)
+	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &user, nil
+}
 
 // UpdateUser memperbarui user dan mengembalikan data yang diperbarui.
 func UpdateUser(db *sql.DB, id int, data map[string]interface{}) (*entities.User, error) {

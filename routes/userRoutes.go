@@ -17,5 +17,7 @@ func RegisterUserRoutes(db *sql.DB) *mux.Router {
 	r.HandleFunc("/user", controllers.CreateUser(db)).Methods("POST")
 	r.HandleFunc("/user/{id}", controllers.UpdateUser(db)).Methods("PUT")
 	r.HandleFunc("/user/{id}", controllers.DeleteUser(db)).Methods("DELETE")
+
+	r.HandleFunc("/auth/login", controllers.Login(db)).Methods("POST")
 	return r
 }

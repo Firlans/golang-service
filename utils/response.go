@@ -45,10 +45,10 @@ func SuccessResponse(message string, detail interface{}) entities.Response {
 	}
 }
 
-func NotFoundResponse(object string, valueId string) entities.Response {
+func NotFoundResponse(message string) entities.Response {
 	return entities.Response{
 		Status:  "fail",
-		Message: object + " with id's " + valueId + " not found",
+		Message: message,
 	}
 }
 

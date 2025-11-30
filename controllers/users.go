@@ -16,7 +16,6 @@ import (
 func CreateUser(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-
 		var req entities.CreateUserRequest
 
 		err := json.NewDecoder(r.Body).Decode(&req)
@@ -39,7 +38,6 @@ func CreateUser(db *sql.DB) http.HandlerFunc {
 			}
 			return
 		}
-
 		utils.RespondJSON(w, http.StatusCreated, entities.Response{
 			Status:  "success",
 			Message: "user created successfully",
@@ -136,10 +134,47 @@ func GetUserById(db *sql.DB) http.HandlerFunc {
 		}
 
 		if user == nil {
-			utils.RespondJSON(w, http.StatusNotFound, utils.NotFoundResponse("user", ids))
+			utils.RespondJSON(w, http.StatusNotFound, utils.NotFoundResponse("user with id "+ids+" is not found"))
 			return
 		}
 
 		utils.RespondJSON(w, http.StatusOK, utils.SuccessResponse("User retrieved successfully", user))
+	}
+}
+func Login(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var (
+			req   entities.UserLogin
+			token string
+		)
+		err := json.NewDecoder(r.Body).Decode(&req)
+
+		if err != nil {
+			utils.RespondJSON(w, http.StatusBadRequest, utils.ErrorResponse("Server Error", err.Error()))
+			return
+		}
+
+		if req.Email == "" || req.Password == "" {
+			utils.RespondJSON(w, http.StatusBadRequest, utils.InvalidRequestResponse("Invalid input", "email and password are required"))
+			return
+		}
+
+		user, err := models.GetUserByNameAndPassword(db, req.Email, req.Password)
+		if err != nil {
+			utils.RespondJSON(w, http.StatusInternalServerError, utils.ErrorResponse("Server error", err.Error()))
+			return
+		}
+		if user == nil {
+			utils.RespondJSON(w, http.StatusNotFound, utils.NotFoundResponse("user with name "+req.Email+" and password "+req.Password+" is not found"))
+			return
+		}
+
+		token, err = utils.CreateToken(user.Id, "abc123")
+		if err != nil {
+			utils.RespondJSON(w, http.StatusInternalServerError, utils.ErrorResponse("Token generation error", err.Error()))
+			return
+		}
+
+		utils.RespondJSON(w, http.StatusOK, utils.SuccessResponse("Login successfully", token))
 	}
 }
